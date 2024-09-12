@@ -32,8 +32,8 @@ jobs:
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}
           tags: |
-            type=raw,value=${{ env.DEBIAN_SNAPSHOT }}-{{sha}}
             ${{ env.DEBIAN_SNAPSHOT }}
+            type=raw,value=${{ env.DEBIAN_SNAPSHOT }}-{{sha}}
             type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
 
       - name: Login to image registry
