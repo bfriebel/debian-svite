@@ -1,0 +1,60 @@
+name: Build Debian SVITE image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-debian-svite-workspace.yaml
+      - workspace/Dockerfile
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  DEBIAN_SNAPSHOT: bullseye-20220328
+  WORKSPACE_USER: svite
+  TYPE: workspace
+
+jobs:
+  build-debian-svite:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Extract debian-svite-runner metadata
+        id: meta
+        env:
+          BASE_TAG: ${{ env.DEBIAN_SNAPSHOT }}-${{ env.WORKSPACE_USER }}
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}-${{ env.TYPE }}
+          tags: |
+            ${{ env.BASE_TAG }}
+            type=raw,value=${{ env.BASE_TAG }}-{{sha}}
+            type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
+
+      - name: Login to image registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      ## Build the image
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.TYPE }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          build-args: |
+            DEBIAN_SNAPSHOT=${{ env.DEBIAN_SNAPSHOT }}
+            WORKSPACE_USER=${{ env.WORKSPACE_USER }}
+            TZ=${{ vars.TZ || 'Europe/Berlin' }}

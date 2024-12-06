@@ -1,0 +1,21 @@
+services:
+  debian-svite-workspace:
+    build:
+      context: .
+      args:
+        DEBIAN_SNAPSHOT: ${DEBIAN_SNAPSHOT:?}
+        WORKSPACE_USER: ${WORKSPACE_USER:?}
+    image: ghcr.io/bfriebel/debian-svite-workspace:${DEBIAN_SNAPSHOT:?}-${WORKSPACE_USER:?}
+    container_name: debian-svite-workspace
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    restart: unless-stopped
+    volumes:
+      - svite-home:/home/${WORKSPACE_USER:?}
+      - ${GIT_CONFIG:?}:/home/${WORKSPACE_USER:?}/.gitconfig:ro
+      - ${SSH:?}:/home/${WORKSPACE_USER:?}/.ssh:ro
+      - ${WORKSPACE:?}:/home/${WORKSPACE_USER:?}/workspace
+
+volumes:
+  svite-home:
+    external: true
