@@ -11,6 +11,7 @@ on:
 env:
   CONTAINER_REGISTRY: ghcr.io
   DEBIAN_SNAPSHOT: bullseye-20220328
+  WORKSPACE_USER: svite
   TYPE: gitea-runner
 
 jobs:
@@ -28,12 +29,14 @@ jobs:
 
       - name: Extract debian-svite-runner metadata
         id: meta
+        env:
+          BASE_TAG: ${{ env.DEBIAN_SNAPSHOT }}-${{ env.WORKSPACE_USER }}
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.CONTAINER_REGISTRY }}/${{ github.repository }}-${{ env.TYPE }}
           tags: |
-            ${{ env.DEBIAN_SNAPSHOT }}
-            type=raw,value=${{ env.DEBIAN_SNAPSHOT }}-{{sha}}
+            ${{ env.BASE_TAG }}
+            type=raw,value=${{ env.BASE_TAG }}-{{sha}}
             type=raw,value=latest,enable=${{ github.ref_name == 'main' }}
 
       - name: Login to image registry
@@ -53,4 +56,5 @@ jobs:
           push: true
           build-args: |
             DEBIAN_SNAPSHOT=${{ env.DEBIAN_SNAPSHOT }}
+            WORKSPACE_USER=${{ env.WORKSPACE_USER }}
             TZ=${{ vars.TZ || 'Europe/Berlin' }}

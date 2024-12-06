@@ -7,31 +7,31 @@ FROM debian/snapshot:${DEBIAN_SNAPSHOT}
 # --- buildpack-deps:bullseye-curl ---
 
 RUN set -eux; \
-  apt-get update; \
-  apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    gnupg \
-    netbase \
-    wget \
-  ; \
-  rm -rf /var/lib/apt/lists/*
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        gnupg \
+        netbase \
+        wget \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
 
 # --- custom ---
 
 RUN set -ex; \
-  apt-get update; \
-  apt-get install -y \
-    sudo \
-    locales \
-    bash-completion \
-    build-essential \
-    nano \
-    git \
-    git-lfs \
-  ; \
-  rm -rf /var/lib/apt/lists/*
+    apt-get update; \
+    apt-get install -y \
+        sudo \
+        locales \
+        bash-completion \
+        build-essential \
+        nano \
+        git \
+        git-lfs \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
 
 # set locale according to https://serverfault.com/a/689947 (https://web.archive.org/web/20240912091718/https://serverfault.com/questions/362903/how-do-you-set-a-locale-non-interactively-on-debian-ubuntu/689947#689947)
@@ -115,6 +115,6 @@ RUN set -ex \
 
 # customized to load docker-entrypoint.sh from original commit
 ADD https://raw.githubusercontent.com/nodejs/docker-node/4e8fe34165d79044d7ea909021ccc0de3e3b4c6d/14/bullseye/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT [ "docker-entrypoint.sh" ]
 
 CMD [ "node" ]
