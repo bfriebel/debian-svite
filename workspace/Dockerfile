@@ -29,6 +29,8 @@ RUN set -ex; \
         tree \
         git \
         git-lfs \
+        python3 \
+        python3-pip \
         p7zip-full \
         ; \
     rm -rf /var/lib/apt/lists/*
